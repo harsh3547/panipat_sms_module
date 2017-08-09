@@ -1,0 +1,19 @@
+<?xml version="1.0"?>
+<openerp>
+	<data>
+		<!-- CRM Lead Form View -->
+		<record id="panipat_sms_edit_employee" model="ir.ui.view">
+			<field name="name">Panipat.sms.edit.employee</field>
+			<field name="model">hr.employee</field>
+			<field name="inherit_id" ref="hr.view_employee_form" />
+			<field name="arch" type="xml">
+				<xpath expr="//field[@name='mobile_phone']" position="replace"/>
+				<xpath expr="//label[@for='work_phone']" position="attributes">
+					<attribute name="string">Mobile Number</attribute>
+					<attribute name="class"></attribute>
+				</xpath>
+			</field>
+		</record>		
+
+	</data>
+</openerp>
