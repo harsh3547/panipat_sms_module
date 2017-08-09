@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+    <data>
+        <record id="form_panipat_config_sms" model="ir.ui.view">
+            <field name="name">Configure Panipat Sms</field>
+            <field name="model">panipat.sms.framework</field>
+            <field name="arch" type="xml">
+                <form string="Panipat Sms Settings"  create="0" delete="0">
+                	<sheet>
+	                	<group col="3">
+	                		<field name="apikey" colspan="3"/>
+	                		<field name="credits_left" readonly="1"/><button class="oe_inline" name="getbalance" string="Get Balance"  type="object"/>
+	                		<field name="sender_name" readonly="1"/><button class="oe_inline" name="get_sender_names" string="Get Names"  type="object"/>
+	                	</group>
+		                	<group>
+		                		<label for="templates"/><button class="oe_inline" name="get_templates" string="Get Templates"  type="object"/>
+		                	</group>
+		                	<div>
+		                		<field name="templates" colspan="2">
+		                			<tree string="Message Templates" colspan="2" create="0" delete="0">
+		                				<field name="internal_id"/>
+		                				<field name="senderName"/>
+		                				<field name="title"/>
+		                				<field name="msg_content"/>
+		                				<field name="dnd"/>
+		                				<field name="forwardto"/>
+		                				<field name="forwardto_employees"/>
+		                			</tree>
+		                			<form string="Message Templates">
+		                				<sheet>
+		                					<group>
+			                					<field name="internal_id" readonly="1"/>
+				                				<field name="forwardto" widget="many2many_tags"/>
+				                				<field name="forwardto_employees" widget="many2many_tags"/>
+				                				<field name="senderName" readonly="1"/>
+				                				<field name="title" readonly="1"/>
+				                				<field name="msg_content" readonly="1"/>
+				                				<field name="dnd" readonly="1"/>
+		                					</group>
+		                				</sheet>
+		                			</form>
+		                		</field>
+	                		</div>
+	                </sheet>
+                </form>
+            </field>
+        </record>
+
+        <record model="ir.ui.view" id="tree_panipat_config_sms">
+			<field name="name">Configure Panipat Sms</field>
+			<field name="model">panipat.sms.framework</field>
+			<field name="arch" type="xml">
+				<tree string="SMS Config" create="0" delete="0">
+					<field name="sender_name"/>
+					<field name='credits_left'/>
+					<field name='apikey'/>
+				</tree>
+			</field>
+		</record>
+
+
+		<record id="form_panipat_templates" model="ir.ui.view">
+            <field name="name">Panipat Templates SMS</field>
+            <field name="model">panipat.sms.framework.templates</field>
+            <field name="arch" type="xml">
+                <form string="Panipat Sms Templates">
+                		<group>
+        					<field name="internal_id" readonly="1"/>
+            				<field name="senderName" readonly="1"/>
+            				<field name="title" readonly="1"/>
+            				<field name="msg_content" readonly="1"/>
+            				<field name="dnd" readonly="1"/>
+        				</group>
+        		</form>
+        	</field>
+        </record>
+
+
+        <record id="action_panipat_sms_config" model="ir.actions.act_window">
+            <field name="name">Configure Panipat Sms</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">panipat.sms.framework</field>
+            <field name="view_type">form</field>
+            <field name='view_mode'>tree,form</field>
+
+        </record>
+
+        <menuitem id="menu_panipat_sms_config" name="Configure SMS" parent="base.menu_config"
+            action="action_panipat_sms_config" sequence="8"/>
+
+
