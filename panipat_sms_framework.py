@@ -134,3 +134,48 @@ class panipat_sms_framework(models.Model):
     forwardto=fields.Many2many(comodel_name='res.partner',string="Forward To Contacts")
     forwardto_employees=fields.Many2many(comodel_name='hr.employee',string="Forward To Employees")
 
+class panipat_sms_send(models.TransientModel):
+    _name="panipat.sms.send"
+
+    partners=fields.Many2many(comodel_name='res.partner',string="Contacts")
+    partner_numbers=fields.Char("Contact Nos.")
+    recipients=fields.Text("Other Recipients")
+    employee=fields.Many2many(comodel_name='hr.employee',string="Employees")
+    employee_numbers=fields.Char("Employee Numbers")
+
+
+    @api.onchange("partners")
+    def onchange_partners(self):
+        partner_numbers=[]
+        for rec in self.partners:
+            if rec.mobile:
+                try:
+                    int(rec.mobile)
+                except ValueError:
+                    raise except_orm(_('Error!'), _('Each Contact Number should be 10 digits only. please check the contact ""%s""'%(rec.name)))
+                if len(str(int(rec.mobile)))!=10:
+                    raise except_orm(_('Error!'), _('Each Contact Number should be 10 digits only. please check the contact ""%s""'%(rec.name)))
+                #print n
+                partner_numbers.append(str(rec.mobile))
+            else:
+                partner_numbers.append("-empty-")
+        self.partner_numbers=",".join(partner_numbers)
+
+    @api.onchange("employee")
+    def onchange_employee(self):
+        employee_numbers=[]
+        for rec in self.employee:
+            if rec.work_phone:
+                try:
+                    int(rec.work_phone)
+                except ValueError:
+                    raise except_orm(_('Error!'), _('Each Employee Work Mobile should be 10 digits only. please check the contact ""%s""'%(rec.name)))
+                if len(str(int(rec.work_phone)))!=10:
+                    raise except_orm(_('Error!'), _('Each Employee Work Mobile should be 10 digits only. please check the contact ""%s""'%(rec.name)))
+                #print n
+                employee_numbers.append(str(rec.work_phone))
+            else:
+                employee_numbers.append("-empty-")
+        self.employee_numbers=",".join(employee_numbers)
+
+
