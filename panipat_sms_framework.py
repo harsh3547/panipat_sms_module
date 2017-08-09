@@ -121,6 +121,25 @@ class panipat_sms_framework(models.Model):
                 pass
             else:
                 raise except_orm(_('Error!'), _('Please check internet \nPlease Contact administrator \n %s'%(e)))
+
+    def get_message_status(self,id):
+        # return status and deliverytime
+        # id = id of msg from send_sms api response
+        api_status="http://api.textlocal.in/status_message/"
+        rec_framework=self.env['panipat.sms.framework'].search([])
+        data_status={'apikey':rec_framework.apikey,'message_id':id}
+        try:
+            resp = requests.post(url=api_status,data=data_status)
+            response = resp.json()
+            print response
+            #print j['status']
+            if response['status']=='success':
+                return {'status':response['message']['status']}
+            else:
+                raise except_orm(_('Error!'), _('Please Contact administrator \n %s'%(str(resp.text))))
+        except requests.exceptions.RequestException as e:  # This is the correct syntax
+            raise except_orm(_('Error!'), _('Please check internet \n\n Please Contact administrator \n %s'%(e)))
+
 class panipat_sms_framework(models.Model):
     _name = "panipat.sms.framework.templates"
     _rec_name="title"
