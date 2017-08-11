@@ -179,6 +179,9 @@ class panipat_sms_send(models.TransientModel):
     partners=fields.Many2many(comodel_name='res.partner',string="Contacts")
     partner_numbers=fields.Char("Contact Nos.")
     recipients=fields.Text("Other Recipients")
+    templates=fields.Many2one(comodel_name="panipat.sms.framework.templates",string="Approved Messages")
+    msg=fields.Text("Message")
+    test_mode=fields.Boolean("Test Mode")
     employee=fields.Many2many(comodel_name='hr.employee',string="Employees")
     employee_numbers=fields.Char("Employee Numbers")
 
@@ -218,3 +221,21 @@ class panipat_sms_send(models.TransientModel):
         self.employee_numbers=",".join(employee_numbers)
 
 
+    @api.onchange("templates")
+    def onchange_templates(self):
+        rec=self.templates
+        print "=-========================",type(rec.msg_content)
+        if type(rec.msg_content)==type(u'abc'):
+            if rec.title=='measurement_rep':
+                self.msg=re.sub(r'%%.+%%',"%% Enter Date/Day , maxlength = 27 %%",rec.msg_content)
+            elif rec.title=='thanks visit':
+                company_phone = self.env.user.company_id.phone if self.env.user.company_id.phone else "Enter Company phone no , maxlength = 22"
+                self.msg=re.sub(r'%%.+%%',"%% "+ company_phone +" %%",rec.msg_content)
+            elif rec.title=='employee_msg':
+                msg=rec.msg_content
+                msg=re.sub(r'%%.+employee.+%%',"%% Enter employee name (date for visit)  , maxlength = 100 %%",msg)
+                msg=re.sub(r'%%.+number.+%%',"%% Enter contact name and number  , maxlength = 100 %%",msg)
+                msg=re.sub(r'%%.+group.+%%',"%% Enter Order Group , maxlength = 8 %%",msg)
+                msg=re.sub(r'%%.+lead.+%%',"%% Enter Lead ID , maxlength = 7 %%",msg)
+                self.msg=msg
+            
