@@ -140,6 +140,26 @@ class panipat_sms_framework(models.Model):
         except requests.exceptions.RequestException as e:  # This is the correct syntax
             raise except_orm(_('Error!'), _('Please check internet \n\n Please Contact administrator \n %s'%(e)))
 
+    def indian_to_utc(self,datetime_india):
+        # time from api of textlocal is of indian timezone
+        # so converting to UTC coz odoo will convert to user's timezone
+        tz_name = pytz.timezone("Asia/Kolkata")
+        d_tz=tz_name.normalize(tz_name.localize(datetime_india,is_dst=False))
+        utc=pytz.timezone("UTC")
+        d_utc=d_tz.astimezone(utc)
+        print "D_UTC====",d_utc,type(d_utc)
+        return d_utc
+        
+
+    def utc_to_indian(self,datetime_utc):
+        tz_name = pytz.timezone("UTC")
+        d_tz=tz_name.normalize(tz_name.localize(datetime_utc,is_dst=False))
+        indian_tz=pytz.timezone("Asia/Kolkata")
+        d_india=d_tz.astimezone(indian_tz)
+        print "d_india===",d_india
+        return d_india
+
+
 class panipat_sms_framework(models.Model):
     _name = "panipat.sms.framework.templates"
     _rec_name="title"
