@@ -182,6 +182,8 @@ class panipat_sms_send(models.TransientModel):
     templates=fields.Many2one(comodel_name="panipat.sms.framework.templates",string="Approved Messages")
     msg=fields.Text("Message")
     test_mode=fields.Boolean("Test Mode")
+    send_later=fields.Boolean("Send On Later Date")
+    later_datetime=fields.Datetime("Later Date")
     employee=fields.Many2many(comodel_name='hr.employee',string="Employees")
     employee_numbers=fields.Char("Employee Numbers")
 
