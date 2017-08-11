@@ -241,3 +241,60 @@ class panipat_sms_send(models.TransientModel):
                 msg=re.sub(r'%%.+lead.+%%',"%% Enter Lead ID , maxlength = 7 %%",msg)
                 self.msg=msg
             
+    @api.multi
+    def send_sms(self):
+        rec_framework=self.env['panipat.sms.framework'].search([])
+        api_endpoint="http://api.textlocal.in/send/"
+        data_sms={'apikey':rec_framework.apikey,'sender':rec_framework.sender_name,'test':self.test_mode}
+        all_nos=[]
+
+
+        n1=[]
+        if self.recipients:
+            n1=self.recipients.replace(" ","").split(",")
+        #print n1
+        for n in n1:
+            try:
+                int(n)
+            except ValueError:
+                raise except_orm(_('Error!'), _('Each Other Recipient Number should be 10 digits only'))
+            if len(str(int(n)))!=10:
+                raise except_orm(_('Error!'), _('Each Other Recipient Number should be 10 digits only'))
+        if n1:
+            all_nos+=n1
+
+
+        employee_numbers=[]
+        employee_number_name={}
+        
+        partner_numbers=[]
+        partner_number_name={}
+        for rec in self.partners:
+            if rec.mobile:
+                try:
+                    int(rec.mobile)
+                except ValueError:
+                    raise except_orm(_('Error!'), _('Each Contact Number should be 10 digits only. please check the contact ""%s""'%(rec.name)))
+                if len(str(int(rec.mobile)))!=10:
+                    raise except_orm(_('Error!'), _('Each Contact Number should be 10 digits only. please check the contact ""%s""'%(rec.name)))
+                partner_numbers.append(str(int(rec.mobile)))
+                partner_number_name[str(int(rec.mobile))]=rec.id
+
+        if partner_numbers:
+            all_nos+=partner_numbers
+
+        for rec in self.employee:
+            if rec.work_phone:
+                try:
+                    int(rec.work_phone)
+                except ValueError:
+                    raise except_orm(_('Error!'), _('Each Employee Number should be 10 digits only. please check the contact ""%s""'%(rec.name)))
+                if len(str(int(rec.work_phone)))!=10:
+                    raise except_orm(_('Error!'), _('Each Employee Number should be 10 digits only. please check the contact ""%s""'%(rec.name)))
+                employee_numbers.append(str(int(rec.work_phone)))
+                employee_number_name[str(int(rec.work_phone))]=rec.id
+
+        if partner_numbers:
+            all_nos+=partner_numbers
+        if employee_numbers:
+            all_nos+=employee_numbers
