@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+    <data noupdate="1">
+        <record id="panipat_sms_settings_1" model="panipat.sms.framework">
+            <field name="apikey">PgNB/SljDno-isxfHQR6wO63wCxLjgvl6Rs2NtKs2d</field>
+        </record>
+        <function name="getbalance" model="panipat.sms.framework" eval="[[ref('panipat_sms_settings_1')]]"/>
+        <function name="get_sender_names" model="panipat.sms.framework" eval="[[ref('panipat_sms_settings_1')]]"/>
+        <function name="get_templates" model="panipat.sms.framework" eval="[[ref('panipat_sms_settings_1')]]"/>
+    </data>
+</openerp>   
