@@ -160,6 +160,7 @@ class panipat_sms_framework(models.Model):
         return d_india
 
 
+
 class panipat_sms_framework(models.Model):
     _name = "panipat.sms.framework.templates"
     _rec_name="title"
@@ -410,4 +411,36 @@ class panipat_sms_list_single(models.Model):
     sent_time=fields.Datetime(string="Sent Time")
     delivery_time=fields.Datetime(string="Delivery Time") # field removed coz the time in status api json is sent time
     schedule_time=fields.Datetime(string="Schedule Time")
+
+    @api.multi
+    def check_status(self):
+        print self.id_msg
+        status=self.update_id_msg_record([self.id_msg])
+        '''
+        codes={}
+        for rec in self._get_codes():
+            codes[rec[0]]=rec[1]
+        return {
+                'type': 'ir.actions.client',
+                'tag': 'action_warn',
+                'name': 'Success',
+                'params': {
+                           'title': 'Msg Status!',
+                           'text': 'Your message status is = %s'%(codes[status]),
+                           }
+                }
+        '''
+
+
+    def update_id_msg_record(self,values):
+        assert isinstance(values, list), 'values should be of type list'
+        #values=[id1,id2,..]  id1,id2 = id of msg from send_sms api response
+        for id1 in values:
+            rec_single=self.search([('id_msg','=',id1)])
+            if rec_single:
+                resp=self.env['panipat.sms.framework'].get_message_status(id1)
+                if resp:
+                    rec_single.status=resp['status']
+                    return resp['status']
+        
 
