@@ -23,4 +23,13 @@
                     <group>
 
                     	<field name="recipients" attrs="{'required':[('partners','=',[(6,False,[])]),('employee','=',[(6,False,[])])]}"/>
-                    	<field name="templates" options="{'create': false, 'create_edit': false}" required="1" widget="selection"/>
+                    	<field name="templates" options="{'create': false, 'create_edit': false}" required="1" widget="selection"/>                    	<field name="msg"/>
+                    	</div>
+                    	<field name="msg"/>
+                        <label for="send_later"/>
+                        <div >
+                            <field name="send_later" class="oe_inline"/>
+                            <label string="....." class="oe_inline" attrs="{'invisible':[('send_later','=',False)]}"/>
+                            <field name="later_datetime" class="oe_inline" attrs="{'invisible':[('send_later','=',False)],'required':[('send_later','=',True)]}"/>
+                        </div>
+                    </group>

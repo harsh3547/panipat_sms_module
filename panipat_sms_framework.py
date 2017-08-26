@@ -298,3 +298,11 @@ class panipat_sms_send(models.TransientModel):
             all_nos+=partner_numbers
         if employee_numbers:
             all_nos+=employee_numbers
+
+        if self.send_later and self.later_datetime:
+            a1=datetime.strptime(self.later_datetime,"%Y-%m-%d %H:%M:%S") # converting to datetime format
+            a3=time.mktime(a1.timetuple()) # converting to epoch time
+            data_sms['schedule_time']=int(a3)
+            print a3
+
+        data_sms['message']=self.msg.replace("\n", "%n").replace("%%","")
