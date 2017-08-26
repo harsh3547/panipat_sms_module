@@ -23,7 +23,10 @@
                     <group>
 
                     	<field name="recipients" attrs="{'required':[('partners','=',[(6,False,[])]),('employee','=',[(6,False,[])])]}"/>
-                    	<field name="templates" options="{'create': false, 'create_edit': false}" required="1" widget="selection"/>                    	<field name="msg"/>
+                    	<field name="templates" options="{'create': false, 'create_edit': false}" required="1" widget="selection"/>
+                    	<div colspan="2">
+
+							<h3>Remove and edit the parts between %%% --- %%% ONLY</h3>
                     	</div>
                     	<field name="msg"/>
                         <label for="send_later"/>
@@ -33,3 +36,28 @@
                             <field name="later_datetime" class="oe_inline" attrs="{'invisible':[('send_later','=',False)],'required':[('send_later','=',True)]}"/>
                         </div>
                     </group>
+                    <div>
+                        Test Mode for testing messages , msg is not sent
+                        </div>
+                    <group>
+                        <field name="test_mode"/>
+                    </group>
+                    <button name="send_sms" class="oe_highlight" string="Send SMS"  type="object"/>
+                </sheet>
+                </form>
+            </field>
+        </record>
+
+    	<record id="action_panipat_sms_send" model="ir.actions.act_window">
+            <field name="name">Panipat SMS Send</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">panipat.sms.send</field>
+            <field name="view_mode">form</field>
+            <field name="target">inline</field>
+        </record>
+
+    	<menuitem id="panipat_sms_menu_header" name="SMS Module" parent="panipat_handloom.panipat_main_menu" sequence="1000"/>
+		<menuitem id="panipat_sms_submenu" name="Send SMS" parent="panipat_sms_menu_header" sequence="1" action="action_panipat_sms_send" />
+	
+    </data>
+</openerp>   

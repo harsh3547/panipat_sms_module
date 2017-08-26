@@ -1,0 +1,17 @@
+<?xml version="1.0"?>
+<openerp>
+	<data>
+		<!-- CRM Lead Form View -->
+		<record id="panipat_order_group_sms" model="ir.ui.view">
+			<field name="name">Panipat.order.group.sms</field>
+			<field name="model">panipat.order.group</field>
+			<field name="inherit_id" ref="panipat_handloom.panipat_order_group_form" />
+			<field name="arch" type="xml">
+				<xpath expr="//field[@name='partner_id']" position="after">
+					<field name="custom_company"/>
+				</xpath>
+			</field>
+		</record>		
+
+	</data>
+</openerp>

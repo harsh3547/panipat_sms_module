@@ -1,0 +1,49 @@
+<?xml version="1.0"?>
+<openerp>
+	<data>
+		<!-- CRM Lead Form View -->
+		<record id="panipat_crm_case_form_sms" model="ir.ui.view">
+			<field name="name">Panipat.crm.leads.sms</field>
+			<field name="model">panipat.crm.lead</field>
+			<field name="inherit_id" ref="panipat_handloom.panipat_crm_case_form_view_leads" />
+			<field name="arch" type="xml">
+				<xpath expr="//button[@name='lead_amount_paid_records']" position="before">
+					<button name="welcome_msg" class="oe_inline oe_stat_button"
+								type="object" icon="fa-comment" attrs="{'invisible':[('state','in',('draft','cancel'))]}">
+								<div>
+									<strong>
+										<field name="total_paid_amount" />
+									</strong>
+									<br />
+									<strong>Welcome Msg</strong>
+								</div>
+							</button>
+					<button name="measurement_msg" class="oe_inline oe_stat_button"
+								type="object" icon="fa-gavel" attrs="{'invisible':[('state','in',('draft','cancel'))]}">
+								<div>
+									<strong>
+										<field name="total_paid_amount" />
+									</strong>
+									<br />
+									<strong>Measure Msg</strong>
+								</div>
+							</button>
+					<button name="employee_msg" class="oe_inline oe_stat_button"
+								type="object" icon="fa-male" attrs="{'invisible':[('state','in',('draft','cancel'))]}">
+								<div>
+									<strong>
+										<field name="total_paid_amount" />
+									</strong>
+									<br />
+									<strong>Employee Msg</strong>
+								</div>
+							</button>
+				</xpath>
+				<xpath expr="//field[@name='order_group']" position="after">
+					<field name="custom_company"/>
+				</xpath>
+			</field>
+		</record>		
+
+	</data>
+</openerp>
