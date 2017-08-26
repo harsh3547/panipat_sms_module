@@ -241,6 +241,10 @@ class panipat_sms_send(models.TransientModel):
                 msg=re.sub(r'%%.+lead.+%%',"%% Enter Lead ID , maxlength = 7 %%",msg)
                 self.msg=msg
             
+    def create_sms_list(self,vals):
+        return self.env['panipat.sms.list'].create(vals)
+
+    
     @api.multi
     def send_sms(self):
         rec_framework=self.env['panipat.sms.framework'].search([])
@@ -306,3 +310,104 @@ class panipat_sms_send(models.TransientModel):
             print a3
 
         data_sms['message']=self.msg.replace("\n", "%n").replace("%%","")
+        data_sms['numbers']=",".join(all_nos)
+
+        print data_sms
+        #print len(data_sms['message'])
+        try:
+            resp = requests.post(url=api_endpoint,data=data_sms)
+            response = resp.json()
+            print response
+            #print j['status']
+            if response['status']=='success':
+                rec_framework.getbalance()
+                vals_sms_list={}
+                vals_sms_list['cost']=response['cost']
+                vals_sms_list['content']=response['message']['content'].replace("%n", "\n")
+                vals_sms_list['sender']=response['message']['sender']
+                vals_sms_list['total_num']=response['num_messages']
+                vals_sms_list['num_parts']=response['message']['num_parts']
+                vals_sms_list['msg_header']=self.templates.title
+                vals_sms_list['single_ids']=[]
+                msg_ids=[]
+                for ids in response['messages']:
+                    if self.send_later and self.later_datetime:
+                        schedule_time=self.later_datetime
+                        sent_time=False
+                    else:
+                        schedule_time=False
+                        sent_time=fields.datetime.now()
+                    vals_sms_list['single_ids'].append((0,0,{
+                        'id_msg':ids['id'],
+                        'recipient':ids['recipient'],
+                        'partner':partner_number_name.get(str(ids['recipient'])[2:],False),
+                        'sent_time':sent_time,
+                        'schedule_time':schedule_time,
+                        'status':'?'}))
+                    msg_ids.append(ids['id'])
+
+                print "vals_sms_list-===============",vals_sms_list
+                if 'test_mode' in response:
+                    return {
+                            'type': 'ir.actions.client',
+                            'tag': 'action_warn',
+                            'name': 'Success',
+                            'params': {
+                                       'title': 'SUCCESS!',
+                                       'text': 'Your test message can be sent.',
+                                       }
+                            }
+                else:
+                    rec_sms_list=self.create_sms_list(vals_sms_list)
+                    return {
+                            'name': 'Panipat Sms List',
+                            'view_type': 'form',
+                            'view_mode': 'form',
+                            'res_model': 'panipat.sms.list',
+                            'type': 'ir.actions.act_window',
+                            'res_id': rec_sms_list.id,
+                            'context':self._context
+                            }
+
+            else:
+                raise except_orm(_('Error!'), _('Please Contact administrator \n %s'%(str(resp.text))))
+        except requests.exceptions.RequestException as e:  # This is the correct syntax
+            raise except_orm(_('Error!'), _('Please check internet \n\n Please Contact administrator \n %s'%(e)))
+
+
+class panipat_sms_list(models.Model):
+    _name='panipat.sms.list'
+    _rec_name='msg_header'
+    _order="create_date desc"
+
+
+    def sent_from_models(self):
+        return [('panipat.crm.lead', "Lead")]
+
+    sent_from=fields.Reference(selection='sent_from_models',string="Sent From")
+    partner=fields.Many2one(comodel_name="res.partner",string="Customer/Contact")
+    cost=fields.Integer("Total Cost")
+    total_num=fields.Integer("Number of Msgs Sent")
+    sender=fields.Char("Sender")
+    num_parts=fields.Char("Number of Parts")
+    content=fields.Text("Msg Content")
+    single_ids=fields.One2many(comodel_name='panipat.sms.list.single',string="Messages", inverse_name="panipat_sms_list")
+    msg_header=fields.Char("Title")
+
+
+class panipat_sms_list_single(models.Model):
+    _name='panipat.sms.list.single'
+    _rec_name='id_msg'
+
+    def _get_codes(self):
+        return [('D','Delivered'),('U','Undelivered'),('P','Msg Sent'),('I','Invalid No'),('E','Undelivered'),('?','Msg Sent'),('B','DND Block')]
+
+    id_msg=fields.Char("Msg Id")
+    recipient=fields.Char("Number")
+    partner=fields.Many2one(comodel_name="res.partner",string="Name")
+    panipat_sms_list=fields.Many2one(comodel_name="panipat.sms.list",required=True,ondelete='cascade')
+    status=fields.Selection(selection=_get_codes,string="Last Status")
+    sent_time=fields.Datetime(string="Sent Time")
+    delivery_time=fields.Datetime(string="Delivery Time") # field removed coz the time in status api json is sent time
+    schedule_time=fields.Datetime(string="Schedule Time")
+
